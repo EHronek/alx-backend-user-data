@@ -3,6 +3,8 @@
 import re
 from typing import List
 import logging
+import os
+import mysql.connector
 
 PII_FIELDS = ("name", "email", "phone", "ssn", "password")
 patterns = {
@@ -45,3 +47,24 @@ def get_logger() -> logging.Logger:
     user_logger.propagate = False
     user_logger.addHandler(stream_handler)
     return user_logger
+
+
+def get_db() -> mysql.connector.connection.MySQLConnection:
+    """Returns a connector to Mysql db using env variables"""
+    username = os.getenv('PERSONAL_DATA_DB_USERNAME', default='root')
+    password = os.getenv('PERSONAL_DATA_DB_PASSWORD', '')
+    host = os.getenv('PERSONAL_DATA_DB_HOST ', 'localhost')
+    db_name = os.getenv('PERSONAL_DATA_DB_NAME')
+
+    if not db_name:
+        raise ValueError("Database name missing")
+    try:
+        conn = mysql.connector.connect(
+            user=username,
+            password=password,
+            host=host,
+            database=db_name
+        )
+        return conn
+    except mysql.connector.Error as e:
+        raise ConnectionError(f"Failed to connect database: {e}")
