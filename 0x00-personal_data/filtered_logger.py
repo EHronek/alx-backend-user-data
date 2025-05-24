@@ -63,8 +63,32 @@ def get_db() -> mysql.connector.connection.MySQLConnection:
             user=username,
             password=password,
             host=host,
+            port=3306
             database=db_name
         )
         return conn
     except mysql.connector.Error as e:
         raise ConnectionError(f"Failed to connect database: {e}")
+
+
+def main():
+    """retrieves and displays filtered user data"""
+    logger = get_logger()
+
+    db_conn = get_db()
+    cursor = db_conn.cursor(dictionary=True)
+    fields = "name,email, phone,ssn,password,ip,last_login,user_agent"
+    columns=fields.split(',')
+    query="SELECT {} FROM users;".format(fields)
+    with db_conn.cursor() as cursor:
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        for row in rows:
+            record = map(
+                lambda x: '{}={}'.format(x[0], x[1]),
+                zip(columns, row),
+            )
+            msg = '{};'.format('; '.join(list(record)))
+            args = ("user_data", logging.INFO, None, None, msg, None, None)
+            log_record = logging.LogRecord(*args)
+            logger.handle(log_record)
