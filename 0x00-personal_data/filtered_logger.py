@@ -16,6 +16,7 @@ def filter_datum(fields: List[str], redaction: str, message: str,
     extract, replace = (patterns["extract"], patterns["replace"])
     return re.sub(extract(fields, separator), replace(redaction), message)
 
+
 class RedactingFormatter(logging.Formatter):
     """Redacting formatter class"""
 
