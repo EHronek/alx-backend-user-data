@@ -38,6 +38,10 @@ class RedactingFormatter(logging.Formatter):
 
 def get_logger() -> logging.Logger:
     """creates and returns a logger object"""
-    logger = logging.getLogger("user_data")
+    user_logger = logging.getLogger("user_data")
     stream_handler = logging.StreamHandler()
     stream_handler.setFormatter(RedactingFormatter(PII_FIELDS))
+    user_logger.setLevel(logging.INFO)
+    user_logger.propagate = False
+    user_logger.addHandler(stream_handler)
+    return user_logger
