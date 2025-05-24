@@ -8,7 +8,9 @@ patterns = {
     'replace': lambda x: r'\g<field>={}'.format(x),
 }
 
-def filter_datum(fields: List[str], redaction: str, message: str, separator: str) -> str:
+
+def filter_datum(fields: List[str], redaction: str, message: str,
+                 separator: str) -> str:
     """obfuscate specified fields in a log message"""
     extract, replace = (patterns["extract"], patterns["replace"])
     return re.sub(extract(fields, separator), replace(redaction), message)
