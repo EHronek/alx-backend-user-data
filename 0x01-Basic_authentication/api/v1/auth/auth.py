@@ -20,7 +20,7 @@ class Auth:
                     pattern = '{}/*'.format(exclusion_path)
                 if re.match(pattern, path):
                     return False
-        return true
+        return True
 
     def authorization_header(self, request=None) -> str:
         """Retrives authorization header field from request object"""
