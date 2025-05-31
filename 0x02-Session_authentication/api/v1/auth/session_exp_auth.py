@@ -26,7 +26,7 @@ class SessionExpAuth(SessionAuth):
             "created_at": datetime.now()
         }
         return session_id
-    
+
     def user_id_for_session_id(self, session_id = None):
         """Overloaded method to retrieve the user_id of user
         linked to the given session_id"""
