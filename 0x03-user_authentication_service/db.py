@@ -4,6 +4,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
+from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.exc import InvalidRequestError
 
 from user import Base, User
 
@@ -36,3 +38,14 @@ class DB:
             self.__session.rollback()
             new_user = None
         return new_user
+
+    def find_user_by(self, **kwargs) -> User:
+        """FInds a user based on a set if filters"""
+        if not kwargs:
+            raise InvalidRequestError("No filter creteria provided")
+        try:
+            return self._session.query(User).filter_by(**kwargs).one()
+        except NoResultFound:
+            raise NoResultFound("No user found matching the creteria")
+        except InvalidRequestError as e:
+            raise InvalidRequestError(f"Invalid query as arguments: {str(e)}")
