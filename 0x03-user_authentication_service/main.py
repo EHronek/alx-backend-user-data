@@ -9,6 +9,8 @@ from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm.exc import NoResultFound
 from auth import _hash_password
 
+from auth import Auth
+
 print(User.__tablename__)
 
 for column in User.__table__.columns:
@@ -70,3 +72,20 @@ except ValueError:
 print()
 print("HASH PASSWORD")
 print(_hash_password("Hello ALX"))
+
+email = 'me@me.com'
+password = 'mySecurePwd'
+
+auth = Auth()
+
+try:
+    user = auth.register_user(email, password)
+    print("successfully created a new user!")
+except ValueError as err:
+    print("could not create a new user: {}".format(err))
+
+try:
+    user = auth.register_user(email, password)
+    print("successfully created a new user!")
+except ValueError as err:
+    print("could not create a new user: {}".format(err))
