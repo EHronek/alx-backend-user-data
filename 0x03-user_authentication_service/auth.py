@@ -13,6 +13,7 @@ def _hash_password(password: str) -> bytes:
         bcrypt.gensalt()
     )
 
+
 class Auth:
     """Authentication"""
     def __init__(self):
