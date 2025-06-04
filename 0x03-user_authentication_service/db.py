@@ -49,7 +49,7 @@ class DB:
             raise NoResultFound("No user found matching the creteria")
         except InvalidRequestError as e:
             raise InvalidRequestError(f"Invalid query as arguments: {str(e)}")
-        
+
     def update_user(self, user_id: int, **kwargs) -> None:
         """updates a user based on id"""
         user = self.find_user_by(id=user_id)
