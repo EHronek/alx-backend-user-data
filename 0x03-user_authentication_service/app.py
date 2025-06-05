@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Basic Flask App"""
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, abort, redirect
 from auth import Auth
 
 AUTH = Auth()
@@ -16,7 +16,7 @@ def welcome() -> str:
 
 
 @app.route("/users", methods=["POST"], strict_slashes=False)
-def register_user():
+def users():
     """Handler to register a user"""
     email, password = request.form.get('email'), request.form.get('password')
     try:
@@ -24,6 +24,54 @@ def register_user():
         return jsonify({"email": email, "message": "user created"})
     except ValueError:
         return jsonify({"message": "email already registered"}), 400
+
+
+@app.route("/sessions", methods=["POST"], strict_slashes=False)
+def login() -> str:
+    """create a new session after successful login"""
+    email, password = request.form.get("email"), request.form.get("password")
+    if not AUTH.valid_login(email, password):
+        abort(401)
+    session_id = AUTH.create_session(email)
+    response = jsonify({"email": email, "message": "logged in"})
+    response.set_cookie("session_id", session_id)
+    return response
+
+
+@app.route("/sessions", methods=["DELETE"], strict_slashes=False)
+def logout():
+    """responds to the DELETE /sessions by destroying
+    the session and redirect user to GET /"""
+    session_id = request.cookies.get("session_id")
+    user = AUTH.get_user_from_session_id(session_id)
+    if user is None:
+        abort(403)
+    AUTH.destroy_session(user.id)
+    return redirect("/")
+
+
+@app.route("/profile", methods=["GET"], strict_slashes=False)
+def profile() -> str:
+    """To find a specific user information"""
+    session_id = request.cookies.get("session_id")
+    user = AUTH.get_user_from_session_id(session_id)
+    if user is None:
+        abort(403)
+    return jsonify({"email": user.email})
+
+
+@app.route("/reset_password", methods=["POST"], strict_slashes=False)
+def get_reset_password_token() -> str:
+    """User password reset payload"""
+    email = request.form.get("email")
+    reset_token = None
+    try:
+        reset_token = AUTH.get_reset_password_token(email)
+    except ValueError:
+        reset_token = None
+    if reset_token is None:
+        abort(403)
+    return jsonify({"email": email, "reset_token": reset_token})
 
 
 if __name__ == "__main__":
