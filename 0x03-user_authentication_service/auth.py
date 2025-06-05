@@ -97,7 +97,7 @@ class Auth:
         user = None
         try:
             user = self._db.find_user_by(reset_token=reset_token)
-        except No ResultFound:
+        except NoResultFound:
             user = None
         if user is None:
             raise ValueError()
